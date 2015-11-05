@@ -22,15 +22,19 @@ newDatesFrancesco=[]
 stepsPerDayFrancesco=[]
 
 movesFrancesco=open('Francesco_summary.csv')
-count=0
+
 for line in movesFrancesco:
     row=line.strip().split(',')
-    myDataListFrancesco.append(row)
+    if row[1]=="walking":
+        datesFrancesco.append(row[0])
+        stepsPerDayFrancesco.append(row[5])
+        
 
 for array in myDataListFrancesco:
      if array[1]=="walking":
          datesFrancesco.append(array[0])
          stepsPerDayFrancesco.append(array[5])
+
 
 for date in datesFrancesco:
     if len(date)==8:
@@ -39,11 +43,11 @@ for date in datesFrancesco:
         newDate=date[:5]+"20"+date[5:]   
     newDatesFrancesco.append(newDate)
         
-"""
-print newDates
+
+print datesFrancesco
 print
-print stepsPerDay
-"""
+print stepsPerDayFrancesco
+
 
 xDateFrancesco=[dt.datetime.strptime(newDate,'%m/%d/%Y').date() for newDate in newDatesFrancesco]
 
