@@ -47,7 +47,7 @@ def plotMoves(xData,yData):
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
     locator = mdates.DayLocator()
     locator.MAXTICKS = 4000
-    plt.gca().xaxis.set_major_locator(locator)
+    plt.gca().xaxis.set_major_locator(locator)  
     plt.plot(xDate,yData,'ob-')
     plt.plot(xDate,sedentaryThreshold *len(xData),'r')
     plt.plot(xDate,lowActiveThreshold *len(xData),'g')
@@ -56,9 +56,28 @@ def plotMoves(xData,yData):
     plt.setp(plt.xticks()[1], rotation=60)
     plt.show()
 
-def movesAnalysis(x):
+def overlappingPlotMoves(xData,yData1,xData2,yData2):
+    xDate=[dt.datetime.strptime(date,'%m/%d/%Y') for date in xData ]
+    xDate2=[dt.datetime.strptime(date,'%m/%d/%Y') for date in xData2 ]
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+    locator = mdates.DayLocator()
+    locator.MAXTICKS = 4000
+    plt.gca().xaxis.set_major_locator(locator)
+    plt.plot(xDate,yData1,'ob-') # blue color is Francesco
+    plt.plot(xDate2,yData2,'ok-')# black color is Daniel
+    plt.plot(xDate2,sedentaryThreshold *len(xData2),'r')
+    plt.plot(xDate2,lowActiveThreshold *len(xData2),'g')
+    plt.plot(xDate2,somewhatActiveThreshold *len(xData2),'c')
+    plt.plot(xDate2,highlyActiveThreshold *len(xData2),'m')
+    plt.setp(plt.xticks()[1], rotation=60)
+    plt.show()
+
+def movesAnalysis(x,y):
     xval,yval=movesFileReader(x)
+    xval2,yval2=movesFileReader(y)
     plotMoves(xval,yval)
+    plotMoves(xval2,yval2)
+    overlappingPlotMoves(xval,yval,xval2,yval2)
 
 ####### Self Report Analysis    
 def selfReportReader(x):
@@ -106,9 +125,27 @@ def plotSelfReport(xData,yData):
     plt.setp(plt.xticks()[1], rotation=60)
     plt.show()
     
-def selfReportAnalysis(x):
+def overlappingSelfReport(xData,yData,xData2,yData2):
+    xDate=[dt.datetime.strptime(date,'%m/%d/%Y') for date in xData ]
+    xDate2=[dt.datetime.strptime(date,'%m/%d/%Y') for date in xData2 ]
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+    locator = mdates.DayLocator()
+    locator.MAXTICKS = 4000
+    plt.gca().xaxis.set_major_locator(locator)
+    plt.gca().set_ylim([4,8.5]) # the y-axis was set between 4 and 8.5 to provide 
+    plt.plot(xDate,yData,'ob-')
+    plt.plot(xDate2,yData2,'ok-')
+    plt.plot(xDate,sleepLowerThreshold *len(xData),'r')
+    plt.plot(xDate,sleepUpperThreshold *len(xData),'r')
+    plt.setp(plt.xticks()[1], rotation=60)
+    plt.show()
+    
+def selfReportAnalysis(x,y):
     xval,yval=sleepTimeGenerator(x)
+    xval2,yval2=sleepTimeGenerator(y)
     plotSelfReport(xval,yval)
+    plotSelfReport(xval2,yval2)
+    overlappingSelfReport(xval,yval,xval2,yval2)
 
 ######### Empatica Analysis
 def empaticaReader(x):
@@ -145,10 +182,22 @@ def plotEmpatica(xData,yData1,):
     plt.setp(plt.xticks()[1], rotation=60)
     plt.show()
 
+def overlappingPlotEmpatica(xData,yData1,yData2):
+    xDate=[dt.datetime.strptime(date,'%m/%d/%Y') for date in xData ]
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+    locator = mdates.DayLocator()
+    locator.MAXTICKS = 4000
+    plt.gca().xaxis.set_major_locator(locator)
+    plt.plot(xDate,yData1,'ob-') # blue is francesco
+    plt.plot(xDate,yData2,'ok-') # black is daniel
+    plt.setp(plt.xticks()[1], rotation=60)
+    plt.show()
+
 def empaticaAnalysis(x):
     dates,hrPatient1,hrPatient2=empaticaReader(x)
     plotEmpatica(dates,hrPatient1) #hrPatient1=Francesco
     plotEmpatica(dates,hrPatient2) #hrPatient2=Daniel
+    overlappingPlotEmpatica(dates,hrPatient1,hrPatient2)
     
 
 if __name__ == '__main__': 
@@ -159,10 +208,10 @@ if __name__ == '__main__':
     selfReportFrancesco='Francesco_sleep.csv' # this csv file is self report file for Francesco
     selfReportDaniel='Daniel_sleep.csv' # this csv file is the self report file fro Daniel
     restingHeartRate='HeartRate.csv'
-    movesAnalysis(movesFrancesco)
-    movesAnalysis(movesDaniel)
-    selfReportAnalysis(selfReportFrancesco)
-    selfReportAnalysis(selfReportDaniel)
+    movesAnalysis(movesFrancesco,movesDaniel)
+    #movesAnalysis(movesDaniel)
+    selfReportAnalysis(selfReportFrancesco,selfReportDaniel)
+    #selfReportAnalysis(selfReportDaniel)
     empaticaAnalysis(restingHeartRate)
     
     """"
