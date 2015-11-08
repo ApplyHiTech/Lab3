@@ -247,6 +247,71 @@ def empaticaAnalysis(x):
     plotEmpatica(dates,hrPatient2) #hrPatient2=Daniel
     overlappingPlotEmpatica(dates,hrPatient1,hrPatient2)
     
+def patientFilter(patientName,movesCSV,sleepCSV,empaticaCSV):
+    """
+    patientFilter checks if the patient fulfills are the requirements for each datastream.
+    If yes, they obtain a score of 3 and are admitted to the clinical trial, if score is < 3
+    patient is filtered out
+    """
+    patientDatesM,patientSteps=movesFileReader(movesCSV)
+    patientDatesS,patientSleep=sleepTimeGenerator(sleepCSV)
+    patientDatesE,patientHR,otherPatientHR=empaticaReader(empaticaCSV)
+    
+    stepCounter=0
+    sleepCounter=0
+    hrCounter=0
+    patientScore=0
+    for steps in patientSteps:
+        if  int(steps) >=5000 and int(steps) <=7499:
+            stepCounter +=1
+        else:
+            stepCounter +=0
+    for sleep in patientSleep:
+       if float(sleep) > 6.5 and float(sleep) <=8:
+           sleepCounter +=1
+       else:
+           sleepCounter +=0
+     
+    if patientName == 'Francesco':
+        for i in range(len(patientHR)-1):
+            if patientHR[i] < patientHR[i+1]:
+                # this case detects an increase in HR, bad for fitness
+                 hrCounter +=-1
+            elif patientHR[i] == patientHR[i+1]:
+                # no change in HR
+                hrCounter += 0
+            else:
+                #this case detects a decrease in HR, good for fitness
+                hrCounter +=1
+    elif patientName == 'Daniel':
+        for i in range(len(otherPatientHR)-1):
+             if otherPatientHR[i] < otherPatientHR[i+1]:
+                 hrCounter +=-1
+             elif otherPatientHR[i] == otherPatientHR[i+1]:
+                hrCounter += 0
+             else:
+                hrCounter +=1
+    
+    #print (stepCounter,sleepCounter,hrCounter)
+    # the following three if statements check whether the patient  can fullfil the
+    #admission score of 3. If score is below 3, patient is filtered out
+    if stepCounter == len (patientSteps):
+        # if all the steps in patientSteps are within threshold add 1 to patientScore
+        patientScore +=1
+    if sleepCounter == len( patientSleep):
+        # if all hours slept in patientSleep are within the threshold add 1 to patientScore
+        patientScore +=1
+    if  hrCounter > 0:
+        patientScore +=1
+    
+    #print patientName
+    #print patientScore
+    if patientScore !=3:
+        # unless patientScore  is 3, patient is filtered out
+        print patientName + ' has a score of '+ str(patientScore) +' out of 3' ' and is not admissable'
+    else:
+        print patientName + ' has a score of '+ str(patientScore) +' out of 3' ' and is admissable'           
+                    
 if __name__ == '__main__': 
     """
     1.The first plot is the moves plot for Francesco
@@ -269,6 +334,8 @@ if __name__ == '__main__':
     movesAnalysis(movesFrancesco,movesDaniel)
     selfReportAnalysis(selfReportFrancesco,selfReportDaniel)
     empaticaAnalysis(restingHeartRate)
+    patientFilter('Francesco',movesFrancesco,selfReportFrancesco,restingHeartRate)
+    patientFilter('Daniel',movesDaniel,selfReportDaniel,restingHeartRate)
 
     
 
